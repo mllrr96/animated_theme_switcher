@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       ),
       builder: (context, themeModel) {
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Animated Switcher Theme Demo',
           themeMode: themeModel.themeMode,
           theme: themeModel.lightTheme,
           darkTheme: themeModel.darkTheme,
@@ -56,13 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 Align(
                   alignment: Alignment.topRight,
-                  child: ThemeSwitcher.withThemeModel(
-                    builder: (_, switcher, theme) {
+                  child: ThemeSwitcher(
+                    builder: (context) {
                       return IconButton(
-                        onPressed: () => switcher.updateTheme(
-                          lightTheme: lightTheme,
-                          darkTheme: darkTheme,
-                        ),
+                        onPressed: () async {
+                          context.toggleThemeMode();
+                        },
                         icon: const Icon(Icons.brightness_3, size: 25),
                       );
                     },
@@ -189,66 +188,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                   )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ThemeSwitcher(
-                    builder: (context) {
-                      return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context)
-                                    .lightTheme ==
-                                PinkTheme.light ||
-                            ThemeModelInheritedNotifier.of(context).darkTheme ==
-                                PinkTheme.dark,
-                        onChanged: (needPink) {
-                          final pink = needPink ?? false;
-                          final themeModel = ThemeModel(
-                              themeMode: ThemeMode.system,
-                              lightTheme: pink ? PinkTheme.light : lightTheme,
-                              darkTheme: pink ? PinkTheme.dark : darkTheme);
-                          context.updateTheme(
-                              lightTheme: themeModel.lightTheme,
-                              darkTheme: themeModel.darkTheme);
-                        },
-                      );
-                    },
-                  ),
-                  ThemeSwitcher(
-                    builder: (context) {
-                      return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context)
-                                .themeModel ==
-                            BlueTheme.dark,
-                        onChanged: (needDarkBlue) {
-                          // ThemeSwitcher.of(context).changeTheme(
-                          //   theme: needDarkBlue != null && needDarkBlue
-                          //       ? darkBlueTheme
-                          //       : lightTheme,
-                          // );
-                        },
-                      );
-                    },
-                  ),
-                  ThemeSwitcher(
-                    builder: (context) {
-                      return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context)
-                                    .lightTheme ==
-                                HalloweenTheme.light ||
-                            ThemeModelInheritedNotifier.of(context).darkTheme ==
-                                HalloweenTheme.dark,
-                        onChanged: (needBlue) {
-                          // ThemeSwitcher.of(context).changeTheme(
-                          //   theme: needBlue != null && needBlue
-                          //       ? halloweenTheme
-                          //       : lightTheme,
-                          // );
-                        },
-                      );
-                    },
-                  ),
                 ],
               ),
             ],

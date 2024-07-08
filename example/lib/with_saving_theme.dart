@@ -46,7 +46,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  Future<ThemeService> future = ThemeService.instance;
+  late Future<ThemeService> future;
+
+  Future<ThemeService> initThemeService() async {
+    return await ThemeService.instance;
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -56,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    future = initThemeService();
     super.initState();
   }
 
@@ -80,18 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context) {
                       return IconButton(
                         onPressed: () async {
-                          // final themeSwitcher = ThemeSwitcher.of(context);
-                          // final themeName =
-                          //     ThemeModelInheritedNotifier.of(context)
-                          //                 .theme
-                          //                 .brightness ==
-                          //             Brightness.light
-                          //         ? 'dark'
-                          //         : 'light';
-                          // final service = await ThemeService.instance
-                          //   ..saveTheme(themeName);
-                          // final theme = service.getByName(themeName);
-                          // themeSwitcher.changeTheme(theme: theme);
+                          context.toggleThemeMode();
                         },
                         icon: const Icon(Icons.brightness_3, size: 25),
                       );
@@ -108,130 +102,207 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'You have pushed the button this many times:',
+                  ),
+                  Text(
+                    '$_counter',
+                    style: const TextStyle(fontSize: 90),
+                  ),
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: const TextStyle(fontSize: 90),
-            ),
-            FutureBuilder(
-                future: future,
-                builder: (context, snapshot) {
-                  ThemeType? themType = snapshot.data?.getTheme();
-                  return ListTile(
-                    title: const Text('Themes'),
-                    trailing: const Icon(Icons.color_lens),
-                    subtitle: Text(themType?.name ?? ''),
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return ThemeSwitcher(builder: (context) {
-                              return SimpleDialog(
-                                title: const Text('Select Theme'),
-                                children: ThemeType.values
-                                    .map((e) => SimpleDialogOption(
-                                          onPressed: () async {
-                                            Navigator.pop(context);
-                                            final service =
-                                                await ThemeService.instance;
-                                            service.saveTheme(e);
-                                            context.updateTheme(
-                                                animateTransition: false,
-                                                lightTheme: e.getThemeData.$1,
-                                                darkTheme: e.getThemeData.$2);
-                                          },
-                                          child: Text(e.name),
-                                        ))
-                                    .toList(),
+            Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        const Divider(height: 0),
+                        FutureBuilder(
+                            future: future,
+                            builder: (context, snapshot) {
+                              final loaded = snapshot.connectionState ==
+                                  ConnectionState.done;
+                              ThemeType? themType = snapshot.data?.getTheme();
+                              return ListTile(
+                                title: const Text('Themes'),
+                                trailing: const Icon(Icons.color_lens),
+                                subtitle: loaded
+                                    ? Text(capitilize(themType?.name ?? ''))
+                                    : const SizedBox(),
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ThemeSwitcher(
+                                            builder: (context) {
+                                          return SimpleDialog(
+                                            title: const Text('Select Theme'),
+                                            children: ThemeType.values
+                                                .map((e) => ListTile(
+                                                      leading: Checkbox(
+                                                        value: e == themType,
+                                                        onChanged:
+                                                            (value) async {
+                                                          Navigator.pop(
+                                                              context);
+                                                          final service =
+                                                              await ThemeService
+                                                                  .instance;
+                                                          service.saveTheme(e);
+                                                          context.updateTheme(
+                                                              animateTransition:
+                                                                  false,
+                                                              lightTheme: e
+                                                                  .getThemeData
+                                                                  .$1,
+                                                              darkTheme: e
+                                                                  .getThemeData
+                                                                  .$2);
+                                                        },
+                                                      ),
+                                                      onTap: () async {
+                                                        Navigator.pop(context);
+                                                        final service =
+                                                            await ThemeService
+                                                                .instance;
+                                                        service.saveTheme(e);
+                                                        context.updateTheme(
+                                                            animateTransition:
+                                                                false,
+                                                            lightTheme: e
+                                                                .getThemeData
+                                                                .$1,
+                                                            darkTheme: e
+                                                                .getThemeData
+                                                                .$2);
+                                                      },
+                                                      title: Text(
+                                                          capitilize(e.name)),
+                                                    ))
+                                                .toList(),
+                                          );
+                                        });
+                                      });
+                                },
                               );
+                            }),
+                        const Divider(height: 0),
+                        CheckboxListTile(
+                          title: const Text('Slow Animation'),
+                          value: timeDilation == 5.0,
+                          onChanged: (value) {
+                            setState(() {
+                              timeDilation = value! ? 5.0 : 1.0;
                             });
-                          });
-                    },
-                  );
-                }),
-            CheckboxListTile(
-              title: const Text('Slow Animation'),
-              value: timeDilation == 5.0,
-              onChanged: (value) {
-                setState(() {
-                  timeDilation = value! ? 5.0 : 1.0;
-                });
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ThemeSwitcher(
-                  clipper: const ThemeSwitcherBoxClipper(),
-                  builder: (context) {
-                    return OutlinedButton(
-                      child: const Text('Box Animation'),
-                      onPressed: () async {
-                        context.toggleThemeMode();
-                        // final themeSwitcher = ThemeSwitcher.of(context);
-
-                        // final themeName =
-                        //     ThemeModelInheritedNotifier.of(context)
-                        //                 .theme
-                        //                 .brightness ==
-                        //             Brightness.light
-                        //         ? 'dark'
-                        //         : 'light';
-                        // final service = await ThemeService.instance
-                        //   ..save(themeName);
-                        // final theme = service.getByName(themeName);
-                        // themeSwitcher.changeTheme(theme: theme);
-                      },
-                    );
-                  },
-                ),
-                ThemeSwitcher(
-                  clipper: const ThemeSwitcherCircleClipper(),
-                  builder: (context) {
-                    return OutlinedButton(
-                      child: const Text('Circle Animation'),
-                      onPressed: () async {
-                        context.toggleThemeMode();
-                        // final themeSwitcher = ThemeSwitcher.of(context);
-
-                        // final themeName =
-                        //     ThemeModelInheritedNotifier.of(context)
-                        //                 .theme
-                        //                 .brightness ==
-                        //             Brightness.light
-                        //         ? 'dark'
-                        //         : 'light';
-                        // final service = await ThemeService.instance
-                        //   ..save(themeName);
-                        // final theme = service.getByName(themeName);
-                        // themeSwitcher.changeTheme(theme: theme);
-                      },
-                    );
-                  },
-                )
-              ],
-            ),
-            ThemeSwitcher(builder: (context) {
-              return SegmentedButton<ThemeMode>(
-                  onSelectionChanged: (themeMode) async {
-                    final service = await ThemeService.instance;
-                    service.saveThemeMode(themeMode.first);
-                    context.updateThemeMode(themeMode: themeMode.first);
-                  },
-                  segments: ThemeMode.values
-                      .map((e) => ButtonSegment<ThemeMode>(
-                          value: e, label: Text(e.name)))
-                      .toList(),
-                  selected: {context.themeMode});
-            }),
+                          },
+                        ),
+                        const Divider(height: 0),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        ThemeSwitcher(
+                          clipper: const ThemeSwitcherBoxClipper(),
+                          builder: (context) {
+                            return OutlinedButton(
+                              child: const Text('Box Animation'),
+                              onPressed: () async {
+                                context.toggleThemeMode();
+                              },
+                            );
+                          },
+                        ),
+                        ThemeSwitcher(
+                          clipper: const ThemeSwitcherCircleClipper(),
+                          builder: (context) {
+                            return OutlinedButton(
+                              child: const Text('Circle Animation'),
+                              onPressed: () async {
+                                context.toggleThemeMode();
+                              },
+                            );
+                          },
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        ThemeSwitcher(
+                          clipper: const ThemeSwitcherBoxClipper(),
+                          builder: (context) {
+                            return OutlinedButton(
+                              child: const Text('Box (Reversed)'),
+                              onPressed: () async {
+                                context.toggleThemeMode(
+                                  isReversed:
+                                      context.brightness == Brightness.dark,
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        ThemeSwitcher(
+                          clipper: const ThemeSwitcherCircleClipper(),
+                          builder: (context) {
+                            return OutlinedButton(
+                              child: const Text('Circle (Reversed)'),
+                              onPressed: () async {
+                                context.toggleThemeMode(
+                                  isReversed:
+                                      context.brightness == Brightness.dark,
+                                );
+                              },
+                            );
+                          },
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        const Text('Theme Mode'),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: ThemeSwitcher(builder: (context) {
+                            return SegmentedButton<ThemeMode>(
+                                onSelectionChanged: (themeMode) async {
+                                  final service = await ThemeService.instance;
+                                  service.saveThemeMode(themeMode.first);
+                                  context.updateThemeMode(
+                                      themeMode: themeMode.first);
+                                },
+                                segments: ThemeMode.values
+                                    .map((e) => ButtonSegment<ThemeMode>(
+                                        value: e,
+                                        label: Text(capitilize(e.name))))
+                                    .toList(),
+                                selected: {context.themeMode});
+                          }),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
+            const SizedBox(height: kToolbarHeight),
           ],
         ),
       ),
     );
+  }
+
+  String capitilize(String s) {
+    return s[0].toUpperCase() + s.substring(1);
   }
 }
 

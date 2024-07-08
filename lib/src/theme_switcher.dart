@@ -72,7 +72,7 @@ class ThemeSwitcherState extends State<ThemeSwitcher> {
   }
 
   void toggleThemeMode({
-    bool animateTransition = false,
+    bool animateTransition = true,
     Offset? offset,
     VoidCallback? onAnimationFinish,
     bool isReversed = false,
@@ -110,7 +110,7 @@ class ThemeSwitcherState extends State<ThemeSwitcher> {
     ThemeData? lightTheme,
     ThemeData? darkTheme,
     bool isReversed = false,
-    bool animateTransition = true,
+    bool animateTransition = false,
     Offset? offset,
     VoidCallback? onAnimationFinish,
   }) {
