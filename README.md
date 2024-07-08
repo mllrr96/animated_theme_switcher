@@ -7,7 +7,7 @@ This is an updated version that support switching theme mode and switching theme
 
 This library starts from [Peyman's](https://stackoverflow.com/users/4910935/peyman) stackoverflow question [how-to-add-animation-for-theme-switching-in-flutter](https://stackoverflow.com/questions/60897816/how-to-add-animation-for-theme-switching-in-flutter)
 
-![demo](demo.gif)
+<img src="demo.gif" height="30%" width="30%"/>
 
 ## Getting started
 
