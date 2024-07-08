@@ -10,7 +10,7 @@ import 'theme_provider.dart';
 typedef ChangeTheme = void Function(ThemeData theme);
 typedef BuilderWithSwitcher = Widget Function(
     BuildContext, ThemeSwitcherState switcher);
-typedef BuilderWithTheme = Widget Function(
+typedef BuilderWithThemeModel = Widget Function(
     BuildContext, ThemeSwitcherState switcher, ThemeModel themeModel);
 
 class ThemeSwitcher extends StatefulWidget {
@@ -31,10 +31,10 @@ class ThemeSwitcher extends StatefulWidget {
         builder: (ctx) => builder(ctx, ThemeSwitcher.of(ctx)),
       );
 
-  factory ThemeSwitcher.withTheme({
+  factory ThemeSwitcher.withThemeModel({
     Key? key,
     clipper = const ThemeSwitcherCircleClipper(),
-    required BuilderWithTheme builder,
+    required BuilderWithThemeModel builder,
   }) =>
       ThemeSwitcher.switcher(
         key: key,
@@ -72,7 +72,7 @@ class ThemeSwitcherState extends State<ThemeSwitcher> {
   }
 
   void toggleThemeMode({
-    bool animateTransition = true,
+    bool animateTransition = false,
     Offset? offset,
     VoidCallback? onAnimationFinish,
     bool isReversed = false,

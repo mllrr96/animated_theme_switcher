@@ -39,7 +39,7 @@ class ThemeNotifier extends ChangeNotifier {
     required GlobalKey key,
     ThemeSwitcherClipper? clipper,
     required bool isReversed,
-    bool animateTransition = true,
+    required bool animateTransition,
     Offset? offset,
     VoidCallback? onAnimationFinish,
   }) async {

@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 Align(
                   alignment: Alignment.topRight,
-                  child: ThemeSwitcher.withTheme(
+                  child: ThemeSwitcher.withThemeModel(
                     builder: (_, switcher, theme) {
                       return IconButton(
                         onPressed: () => switcher.updateTheme(
