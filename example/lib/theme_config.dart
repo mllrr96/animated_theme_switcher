@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 ThemeData lightTheme = ThemeData.light();
 
@@ -8,11 +7,6 @@ ThemeData darkTheme = ThemeData.dark();
 class PinkTheme {
   static ThemeData light = ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF49FB6)),
-    scaffoldBackgroundColor: const Color(0xFFF49FB6),
-    appBarTheme: AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
-      systemNavigationBarColor: const Color(0xFFF49FB6),
-    )),
   );
   static ThemeData dark = ThemeData(
     colorScheme: ColorScheme.fromSeed(
@@ -22,8 +16,8 @@ class PinkTheme {
 
 class HalloweenTheme {
   static ThemeData light = ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF55705A)),
-      scaffoldBackgroundColor: const Color(0xFF55705A));
+    colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF55705A)),
+  );
   static ThemeData dark = ThemeData(
     colorScheme: ColorScheme.fromSeed(
         seedColor: const Color(0xFF55705A), brightness: Brightness.dark),
