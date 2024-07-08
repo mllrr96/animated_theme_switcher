@@ -15,28 +15,27 @@ class ThemeSwitchingArea extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeNotifier = ThemeModelInheritedNotifier.of(context);
 
-    final correctTheme = themeNotifier.themeModel.themeMode == ThemeMode.system
-        ? MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? themeNotifier.themeModel.darkTheme
-            : themeNotifier.themeModel.lightTheme
-        : themeNotifier.themeModel.themeMode == ThemeMode.light
-            ? themeNotifier.themeModel.lightTheme
-            : themeNotifier.themeModel.darkTheme;
+    // final correctTheme = themeNotifier.themeModel.themeMode == ThemeMode.system
+    //     ? MediaQuery.of(context).platformBrightness == Brightness.dark
+    //         ? themeNotifier.themeModel.darkTheme
+    //         : themeNotifier.themeModel.lightTheme
+    //     : themeNotifier.themeModel.themeMode == ThemeMode.light
+    //         ? themeNotifier.themeModel.lightTheme
+    //         : themeNotifier.themeModel.darkTheme;
 
-    // Widget resChild;
     Widget child;
     if (themeNotifier.oldThemeModel == null ||
         themeNotifier.oldThemeModel == themeNotifier.themeModel ||
         !themeNotifier.controller.isAnimating) {
-      child = _getPage(correctTheme);
+      child = this.child;
     } else {
       late final Widget firstWidget, animWidget;
       if (themeNotifier.isReversed) {
-        firstWidget = _getPage(correctTheme);
+        firstWidget = this.child;
         animWidget = RawImage(image: themeNotifier.image);
       } else {
         firstWidget = RawImage(image: themeNotifier.image);
-        animWidget = _getPage(correctTheme);
+        animWidget = this.child;
       }
       child = Stack(
         children: [
@@ -66,11 +65,11 @@ class ThemeSwitchingArea extends StatelessWidget {
     return Material(child: child);
   }
 
-  Widget _getPage(ThemeData brandTheme) {
-    return Theme(
-      key: ValueKey('ThemeSwitchingAreaPage'),
-      data: brandTheme,
-      child: child,
-    );
-  }
+  // Widget _getPage(ThemeData brandTheme) {
+  //   return Theme(
+  //     key: ValueKey('ThemeSwitchingAreaPage'),
+  //     data: brandTheme,
+  //     child: child,
+  //   );
+  // }
 }

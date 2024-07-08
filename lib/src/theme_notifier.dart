@@ -19,7 +19,7 @@ class ThemeNotifier extends ChangeNotifier {
   final AnimationController controller;
 
   ThemeData get lightTheme => _themeModel.lightTheme;
-  ThemeData get darkTheme => _themeModel.lightTheme;
+  ThemeData get darkTheme => _themeModel.darkTheme;
   ThemeMode get themeMode => _themeModel.themeMode;
   ThemeModel get themeModel => _themeModel;
   ThemeModel? oldThemeModel;
