@@ -11,15 +11,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPlatformDark =
-        WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
-    final initTheme = isPlatformDark ? darkTheme : lightTheme;
     return ThemeProvider(
-      initTheme: initTheme,
-      builder: (_, myTheme) {
+      themeModel: ThemeModel(
+        themeMode: ThemeMode.system,
+        lightTheme: PinkTheme.light,
+        darkTheme: PinkTheme.dark,
+      ),
+      builder: (context, themeModel) {
         return MaterialApp(
           title: 'Flutter Demo',
-          theme: myTheme,
+          themeMode: themeModel.themeMode,
+          theme: themeModel.lightTheme,
+          darkTheme: themeModel.darkTheme,
           home: const MyHomePage(),
         );
       },
@@ -56,10 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ThemeSwitcher.withTheme(
                     builder: (_, switcher, theme) {
                       return IconButton(
-                        onPressed: () => switcher.changeTheme(
-                          theme: theme.brightness == Brightness.light
-                              ? darkTheme
-                              : lightTheme,
+                        onPressed: () => switcher.updateTheme(
+                          lightTheme: lightTheme,
+                          darkTheme: darkTheme,
                         ),
                         icon: const Icon(Icons.brightness_3, size: 25),
                       );
@@ -104,13 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       return TapDownButton(
                         child: const Text('Box Animation'),
                         onTap: (details) {
-                          switcher.changeTheme(
-                            theme: ThemeModelInheritedNotifier.of(context)
-                                        .theme
-                                        .brightness ==
-                                    Brightness.light
-                                ? darkTheme
-                                : lightTheme,
+                          switcher.toggleThemeMode(
                             offset: details.localPosition,
                           );
                         },
@@ -123,13 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       return TapDownButton(
                         child: const Text('Circle Animation'),
                         onTap: (details) {
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: ThemeModelInheritedNotifier.of(context)
-                                        .theme
-                                        .brightness ==
-                                    Brightness.light
-                                ? darkTheme
-                                : lightTheme,
+                          context.toggleThemeMode(
                             offset: details.localPosition,
                           );
                         },
@@ -147,17 +137,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       return TapDownButton(
                         child: const Text('Box (Reverse)'),
                         onTap: (details) {
-                          var brightness =
+                          final themeModel =
                               ThemeModelInheritedNotifier.of(context)
-                                  .theme
-                                  .brightness;
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: brightness == Brightness.light
-                                ? darkTheme
-                                : lightTheme,
+                                  .themeModel;
+                          final correctTheme =
+                              themeModel.themeMode == ThemeMode.system
+                                  ? MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? themeModel.darkTheme
+                                      : themeModel.lightTheme
+                                  : themeModel.themeMode == ThemeMode.light
+                                      ? themeModel.lightTheme
+                                      : themeModel.darkTheme;
+                          context.toggleThemeMode(
                             offset: details.localPosition,
                             isReversed:
-                                brightness == Brightness.dark ? true : false,
+                                correctTheme.brightness == Brightness.dark
+                                    ? true
+                                    : false,
                           );
                         },
                       );
@@ -169,17 +166,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       return TapDownButton(
                         child: const Text('Circle (Reverse)'),
                         onTap: (details) {
-                          var brightness =
+                          final themeModel =
                               ThemeModelInheritedNotifier.of(context)
-                                  .theme
-                                  .brightness;
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: brightness == Brightness.light
-                                ? darkTheme
-                                : lightTheme,
+                                  .themeModel;
+                          final correctTheme =
+                              themeModel.themeMode == ThemeMode.system
+                                  ? MediaQuery.of(context).platformBrightness ==
+                                          Brightness.dark
+                                      ? themeModel.darkTheme
+                                      : themeModel.lightTheme
+                                  : themeModel.themeMode == ThemeMode.light
+                                      ? themeModel.lightTheme
+                                      : themeModel.darkTheme;
+                          context.toggleThemeMode(
                             offset: details.localPosition,
                             isReversed:
-                                brightness == Brightness.dark ? true : false,
+                                correctTheme.brightness == Brightness.dark
+                                    ? true
+                                    : false,
                           );
                         },
                       );
@@ -193,14 +197,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   ThemeSwitcher(
                     builder: (context) {
                       return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context).theme ==
-                            pinkTheme,
+                        value: ThemeModelInheritedNotifier.of(context)
+                                    .lightTheme ==
+                                PinkTheme.light ||
+                            ThemeModelInheritedNotifier.of(context).darkTheme ==
+                                PinkTheme.dark,
                         onChanged: (needPink) {
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: needPink != null && needPink
-                                ? pinkTheme
-                                : lightTheme,
-                          );
+                          final pink = needPink ?? false;
+                          final themeModel = ThemeModel(
+                              themeMode: ThemeMode.system,
+                              lightTheme: pink ? PinkTheme.light : lightTheme,
+                              darkTheme: pink ? PinkTheme.dark : darkTheme);
+                          context.updateTheme(
+                              lightTheme: themeModel.lightTheme,
+                              darkTheme: themeModel.darkTheme);
                         },
                       );
                     },
@@ -208,14 +218,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   ThemeSwitcher(
                     builder: (context) {
                       return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context).theme ==
-                            darkBlueTheme,
+                        value: ThemeModelInheritedNotifier.of(context)
+                                .themeModel ==
+                            BlueTheme.dark,
                         onChanged: (needDarkBlue) {
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: needDarkBlue != null && needDarkBlue
-                                ? darkBlueTheme
-                                : lightTheme,
-                          );
+                          // ThemeSwitcher.of(context).changeTheme(
+                          //   theme: needDarkBlue != null && needDarkBlue
+                          //       ? darkBlueTheme
+                          //       : lightTheme,
+                          // );
                         },
                       );
                     },
@@ -223,14 +234,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   ThemeSwitcher(
                     builder: (context) {
                       return Checkbox(
-                        value: ThemeModelInheritedNotifier.of(context).theme ==
-                            halloweenTheme,
+                        value: ThemeModelInheritedNotifier.of(context)
+                                    .lightTheme ==
+                                HalloweenTheme.light ||
+                            ThemeModelInheritedNotifier.of(context).darkTheme ==
+                                HalloweenTheme.dark,
                         onChanged: (needBlue) {
-                          ThemeSwitcher.of(context).changeTheme(
-                            theme: needBlue != null && needBlue
-                                ? halloweenTheme
-                                : lightTheme,
-                          );
+                          // ThemeSwitcher.of(context).changeTheme(
+                          //   theme: needBlue != null && needBlue
+                          //       ? halloweenTheme
+                          //       : lightTheme,
+                          // );
                         },
                       );
                     },

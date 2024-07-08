@@ -13,21 +13,30 @@ class ThemeSwitchingArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = ThemeModelInheritedNotifier.of(context);
+    final themeNotifier = ThemeModelInheritedNotifier.of(context);
+
+    final correctTheme = themeNotifier.themeModel.themeMode == ThemeMode.system
+        ? MediaQuery.of(context).platformBrightness == Brightness.dark
+            ? themeNotifier.themeModel.darkTheme
+            : themeNotifier.themeModel.lightTheme
+        : themeNotifier.themeModel.themeMode == ThemeMode.light
+            ? themeNotifier.themeModel.lightTheme
+            : themeNotifier.themeModel.darkTheme;
+
     // Widget resChild;
     Widget child;
-    if (model.oldTheme == null ||
-        model.oldTheme == model.theme ||
-        !model.controller.isAnimating) {
-      child = _getPage(model.theme);
+    if (themeNotifier.oldThemeModel == null ||
+        themeNotifier.oldThemeModel == themeNotifier.themeModel ||
+        !themeNotifier.controller.isAnimating) {
+      child = _getPage(correctTheme);
     } else {
       late final Widget firstWidget, animWidget;
-      if (model.isReversed) {
-        firstWidget = _getPage(model.theme);
-        animWidget = RawImage(image: model.image);
+      if (themeNotifier.isReversed) {
+        firstWidget = _getPage(correctTheme);
+        animWidget = RawImage(image: themeNotifier.image);
       } else {
-        firstWidget = RawImage(image: model.image);
-        animWidget = _getPage(model.theme);
+        firstWidget = RawImage(image: themeNotifier.image);
+        animWidget = _getPage(correctTheme);
       }
       child = Stack(
         children: [
@@ -37,14 +46,14 @@ class ThemeSwitchingArea extends StatelessWidget {
           ),
           AnimatedBuilder(
             key: ValueKey('ThemeSwitchingAreaSecondChild'),
-            animation: model.controller,
+            animation: themeNotifier.controller,
             child: animWidget,
             builder: (_, child) {
               return ClipPath(
                 clipper: ThemeSwitcherClipperBridge(
-                  clipper: model.clipper,
-                  offset: model.switcherOffset,
-                  sizeRate: model.controller.value,
+                  clipper: themeNotifier.clipper,
+                  offset: themeNotifier.switcherOffset,
+                  sizeRate: themeNotifier.controller.value,
                 ),
                 child: child,
               );
