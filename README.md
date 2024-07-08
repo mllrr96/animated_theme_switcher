@@ -1,8 +1,5 @@
-# animated_theme_switcher
+# Animated_Theme_Switcher v3
 
-Animated theme switcher.
-
-## NOTE
 This is an updated version that support switching theme mode and switching themes (light and dark). Both examples have been updated too.
 
 This library starts from [Peyman's](https://stackoverflow.com/users/4910935/peyman) stackoverflow question [how-to-add-animation-for-theme-switching-in-flutter](https://stackoverflow.com/questions/60897816/how-to-add-animation-for-theme-switching-in-flutter)
